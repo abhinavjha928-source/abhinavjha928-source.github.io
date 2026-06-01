@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>ABHIS | Digital Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=JetBrains+Mono:wght@300;400;700&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after { margin:0; padding:0; box-sizing:border-box; }
+
+:root {
+  /* Purple & Silver Theme */
+  --purple: #b44fff;
+  --purple-glow: rgba(180, 79, 255, 0.5);
+  --silver: #e5e7eb;
+  --silver-dim: #9ca3af;
+  --silver-glow: rgba(229, 231, 235, 0.4);
+  
+  --bg-dark: rgba(10, 5, 15, 0.85);
+  --card-bg: rgba(15, 8, 25, 0.65);
+  --border: rgba(180, 79, 255, 0.3);
+  --border-hi: rgba(229, 231, 235, 0.6);
+  --text: rgba(229, 231, 235, 0.95);
+}
+
+html { scroll-behavior:smooth; }
+
+body {
+  min-height: 100vh;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--text);
+  overflow-x: hidden;
+  cursor: none;
+  position: relative;
+  background-color: #05020a;
+}
+
+/* ── BG IMAGE WITH BLUR ── */
+.bg-img {
+  position: fixed; inset: -20px; z-index: 0;
+  background-image: url('silver-wolf-level-3840x2160-26448.jpg');
+  background-size: cover;
+  background-position: center;
+  filter: blur(18px) brightness(0.35) saturate(1.2);
+}
+
+/* dark vignette overlay */
+.bg-overlay {
+  position: fixed; inset: 0; z-index: 1;
+  background:
+    radial-gradient(ellipse 100% 70% at 50% 100%, rgba(10,5,15,.9) 0%, transparent 70%),
+    radial-gradient(ellipse 60% 50% at 50% 0%, rgba(180,79,255,.08) 0%, transparent 60%),
+    linear-gradient(180deg, rgba(10,5,15,.6) 0%, rgba(10,5,15,.3) 40%, rgba(10,5,15,.85) 100%);
+}
+
+/* animated scan lines */
+.scanlines {
+  position: fixed; inset: 0; z-index: 2; pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg, transparent, transparent 3px,
+    rgba(0,0,0,.06) 3px, rgba(0,0,0,.06) 4px
+  );
+}
+
+/* color noise flicker */
+.noise {
+  position: fixed; inset: 0; z-index: 2; pointer-events: none;
+  opacity: .04;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation: noise-shift 8s steps(1) infinite;
+}
+@keyframes noise-shift { 0%,100%{background-position:0 0;} 25%{background-position:50px 20px;} 50%{background-position:-30px 40px;} 75%{background-position:20px -30px;} }
+
+/* ── CURSOR ── */
+#cur { position:fixed; top:0; left:0; z-index:9999; width:8px; height:8px; border-radius:50%; background:var(--silver); box-shadow:0 0 10px var(--silver), 0 0 22px var(--silver-glow); pointer-events:none; transform:translate(-50%,-50%); transition:width .12s, height .12s; }
+#cur-ring { position:fixed; top:0; left:0; z-index:9998; width:30px; height:30px; border-radius:50%; border:1px solid rgba(229,231,235,.45); pointer-events:none; transform:translate(-50%,-50%); transition:width .28s, height .28s, border-color .28s; }
+
+/* ── LOADER ── */
+#loader { position:fixed; inset:0; z-index:9990; background:#080410; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1.6rem; }
+.ld-name { font-family:'Orbitron',sans-serif; font-size:clamp(2rem,7vw,5rem); font-weight:900; letter-spacing:.12em; color:var(--silver); text-shadow:0 0 30px var(--silver-glow); animation:ld-pulse .7s ease-in-out infinite; }
+@keyframes ld-pulse { 0%,100%{opacity:.35;} 50%{opacity:1;} }
+.ld-bar-wrap { width:min(220px,60vw); height:1px; background:rgba(180,79,255,.2); overflow:hidden; }
+.ld-bar { height:100%; background:linear-gradient(90deg, var(--purple), var(--silver)); box-shadow:0 0 12px var(--purple); animation:ld-fill 1.7s ease-out forwards; }
+@keyframes ld-fill { from{width:0} to{width:100%} }
+.ld-txt { font-size:.5rem; letter-spacing:.38em; color:var(--silver-dim); text-transform:uppercase; }
+
+/* ── PAGE WRAPPER ── */
+.page { position:relative; z-index:3; min-height:100vh; display:flex; flex-direction:column; }
+
+/* ── NAV ── */
+nav {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1.2rem 3rem;
+  border-bottom: 1px solid var(--border);
+  background: rgba(10,5,15,.6);
+  backdrop-filter: blur(20px);
+  position: sticky; top: 0; z-index: 100;
+}
+.nav-logo { display:flex; align-items:center; gap:.85rem; text-decoration:none; }
+.nav-av { width:30px; height:30px; border-radius:50%; overflow:hidden; border:1px solid rgba(229,231,235,.4); box-shadow:0 0 10px rgba(229,231,235,.25); }
+.nav-av img { width:100%; height:100%; object-fit:cover; }
+.nav-title { font-family:'Orbitron',sans-serif; font-size:.65rem; font-weight:700; letter-spacing:.3em; color:var(--silver); text-transform:uppercase; }
+.nav-right { display:flex; align-items:center; gap:.6rem; font-size:.55rem; letter-spacing:.18em; color:var(--silver-dim); text-transform:uppercase; }
+.ndot { width:6px; height:6px; border-radius:50%; background:var(--purple); box-shadow:0 0 8px var(--purple); animation:ndot-blink 2s ease-in-out infinite; }
+@keyframes ndot-blink { 0%,100%{opacity:1;} 50%{opacity:.25;} }
+
+/* ── HERO ── */
+.hero {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 5rem 2rem 5rem;
+  text-align: center;
+  position: relative;
+}
+
+/* diagonal accent line top-left */
+.hero::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:1px;
+  background:linear-gradient(90deg, transparent, var(--purple), var(--silver), transparent);
+  opacity:.4;
+}
+
+.hero-sys {
+  font-size:.55rem; letter-spacing:.42em; color:var(--silver-dim);
+  margin-bottom:1.8rem; text-transform:uppercase;
+  animation:fadeUp .8s .2s both;
+}
+
+.hero-avatar {
+  width:100px; height:100px; border-radius:50%;
+  border:2px solid transparent;
+  background: linear-gradient(var(--card-bg),var(--card-bg)) padding-box,
+              linear-gradient(135deg, var(--silver), var(--purple)) border-box;
+  overflow:hidden;
+  box-shadow: 0 0 32px rgba(180,79,255,.3), 0 0 64px rgba(229,231,235,.15);
+  margin-bottom:1.8rem;
+  animation:fadeUp .8s .3s both;
+}
+.hero-avatar img { width:100%; height:100%; object-fit:cover; }
+
+/* name */
+.hero-name {
+  font-family:'Orbitron',sans-serif; font-weight:900;
+  font-size:clamp(3.5rem, 12vw, 8rem);
+  letter-spacing:.08em; line-height:1; text-transform:uppercase;
+  background:linear-gradient(90deg, var(--silver) 0%, var(--purple) 50%, #fff 100%);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+  position:relative; display:inline-block; user-select:none; cursor:none;
+  animation:fadeUp .9s .38s both, hue-rot 8s linear infinite;
+  filter: drop-shadow(0 0 20px rgba(180,79,255,.4)) drop-shadow(0 0 40px rgba(229,231,235,.2));
+}
+
+@keyframes hue-rot { 
+  0% { filter: drop-shadow(0 0 20px rgba(180,79,255,.4)) drop-shadow(0 0 40px rgba(229,231,235,.2)) hue-rotate(0deg); }
+  50% { filter: drop-shadow(0 0 30px rgba(180,79,255,.6)) drop-shadow(0 0 50px rgba(229,231,235,.4)) hue-rotate(15deg); }
+  100% { filter: drop-shadow(0 0 20px rgba(180,79,255,.4)) drop-shadow(0 0 40px rgba(229,231,235,.2)) hue-rotate(0deg); }
+}
+
+/* glitch */
+.hero-name::before, .hero-name::after {
+  content:attr(data-text); position:absolute; top:0; left:0;
+  font-family:inherit; font-size:inherit; font-weight:inherit; letter-spacing:inherit;
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+}
+.hero-name::before { background:linear-gradient(90deg, var(--purple), var(--silver)); opacity:0; clip-path:polygon(0 15%,100% 15%,100% 35%,0 35%); animation:glitch1 9s ease-in-out infinite; }
+.hero-name::after { background:linear-gradient(90deg, var(--silver), var(--purple)); opacity:0; clip-path:polygon(0 62%,100% 62%,100% 82%,0 82%); animation:glitch2 9s ease-in-out infinite; }
+@keyframes glitch1 { 0%,86%,100%{opacity:0;transform:none;} 88%{opacity:.8;transform:translate(-5px,1px);} 90%{opacity:.5;transform:translate(4px,-1px);} 92%{opacity:0;} }
+@keyframes glitch2 { 0%,86%,100%{opacity:0;transform:none;} 89%{opacity:.6;transform:translate(5px,0);} 91%{opacity:.8;transform:translate(-4px,2px);} 93%{opacity:0;} }
+
+.hero-rule {
+  width:clamp(160px, 35vw, 440px); height:1px;
+  background:linear-gradient(90deg, transparent, var(--silver), var(--purple), transparent);
+  opacity:.35; margin:1.8rem auto;
+  animation:fadeUp .8s .52s both;
+}
+
+.hero-tagline {
+  font-size:clamp(.58rem, .8vw, .74rem); letter-spacing:.28em;
+  color:var(--silver-dim); text-transform:uppercase; line-height:2.3;
+  animation:fadeUp .8s .62s both;
+}
+.hero-tagline span { color:var(--purple); font-weight:bold; }
+
+/* ── DISCORD STATUS (USER) ── */
+.discord-hero-wrap { margin-top:2.6rem; animation:fadeUp .9s .74s both; }
+.discord-hero-label { font-size:.48rem; letter-spacing:.3em; color:var(--silver-dim); text-transform:uppercase; margin-bottom:.55rem; }
+.discord-hero-card {
+  display:inline-flex; align-items:center; gap:1rem;
+  padding:.85rem 1.5rem;
+  background:var(--card-bg);
+  border:1px solid var(--border);
+  backdrop-filter:blur(16px);
+  position:relative; overflow:hidden;
+  min-width:280px; max-width:400px;
+  border-radius: 12px;
+}
+.discord-hero-card::before { content:''; position:absolute; left:0; top:0; width:3px; height:100%; background:var(--silver); box-shadow:0 0 10px var(--silver-glow); }
+.dhc-av-wrap { position:relative; flex-shrink:0; }
+.dhc-av { width:46px; height:46px; border-radius:50%; border:1px solid rgba(229,231,235,.4); overflow:hidden; background:rgba(0,0,0,.4); }
+.dhc-av img { width:100%; height:100%; object-fit:cover; }
+.dhc-badge { position:absolute; bottom:0; right:0; width:14px; height:14px; border-radius:50%; border:2px solid var(--card-bg); background:#747f8d; transition: background 0.3s ease; }
+.dhc-info { text-align:left; min-width:0; flex:1; }
+.dhc-name { font-family:'Orbitron',sans-serif; font-size:.65rem; font-weight:700; color:var(--silver); letter-spacing:.1em; text-transform:uppercase; }
+.dhc-act { font-size:.53rem; color:var(--silver-dim); margin-top:.25rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* ── LINK BUTTONS GRID ── */
+.btn-grid {
+  display:grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: .9rem;
+  margin-top: 3rem;
+  max-width: 720px; width: 100%;
+  animation: fadeUp .9s .84s both;
+}
+
+.hub-btn {
+  display:flex; align-items:center; gap:.7rem;
+  padding:1.1rem 1.4rem;
+  font-family:'JetBrains Mono',monospace;
+  font-size:.62rem; letter-spacing:.18em; text-transform:uppercase;
+  text-decoration:none;
+  background:var(--card-bg);
+  border:1px solid var(--border);
+  border-radius: 12px;
+  backdrop-filter:blur(16px);
+  color:var(--text);
+  position:relative; overflow:hidden;
+  cursor:none;
+  transition:border-color .25s, box-shadow .25s, background .25s, transform .25s;
+}
+
+.hub-btn::before {
+  content:''; position:absolute; inset:0;
+  background:linear-gradient(90deg, transparent, rgba(255,255,255,.08), transparent);
+  transform:translateX(-100%); transition:transform .5s;
+}
+
+.hub-btn:hover::before { transform:translateX(100%); }
+
+.hub-btn:hover {
+  background:rgba(20, 10, 35, 0.85);
+  border-color:var(--border-hi);
+  box-shadow:0 0 22px rgba(180,79,255,.25), inset 0 0 18px rgba(229,231,235,.08);
+  transform: translateY(-2px);
+}
+
+.hub-btn:hover .btn-icon { filter:drop-shadow(0 0 8px var(--silver)); color: var(--silver); }
+.btn-icon { font-size:1.1rem; flex-shrink:0; transition:all .25s; color: var(--purple); display:flex; align-items:center;}
+.btn-icon svg { width: 18px; height: 18px; }
+.btn-label { flex:1; text-align:left; font-weight:bold;}
+.btn-arrow { font-size:.8rem; opacity:.4; transition:opacity .25s, transform .25s; color:var(--silver); }
+.hub-btn:hover .btn-arrow { opacity:1; transform:translate(3px, -3px); }
+
+/* Accent borders per button */
+.hub-btn.v-port  { border-left:3px solid var(--silver);   }
+.hub-btn.v-desk  { border-left:3px solid var(--purple);  }
+.hub-btn.v-git   { border-left:3px solid rgba(200,200,200,.6); }
+.hub-btn.v-disc  { border-left:3px solid #5865f2;        }
+.hub-btn.v-mail  { border-left:3px solid var(--silver-dim);    }
+.hub-btn.v-guns  { border-left:3px solid var(--purple);    }
+
+/* ── SERVER CARD (Spans full width of grid) ── */
+.server-card {
+  grid-column: 1 / -1; 
+  background: linear-gradient(135deg, rgba(25, 12, 40, 0.8), rgba(15, 8, 25, 0.9));
+  border: 1px solid var(--border-hi);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.server-card:hover {
+  box-shadow: 0 0 30px var(--purple-glow), inset 0 0 20px rgba(180,79,255,.15);
+}
+
+.server-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.server-name {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--silver);
+  letter-spacing: 0.1em;
+}
+
+.server-active {
+  font-size: 0.55rem;
+  color: var(--silver-dim);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.active-dot {
+  width: 6px; height: 6px; border-radius: 50%; background: #23a559; box-shadow: 0 0 8px #23a559;
+}
+
+/* ── FOOTER ── */
+footer {
+  position:relative; z-index:3;
+  border-top:1px solid var(--border);
+  padding:1rem 3rem;
+  display:flex; align-items:center; justify-content:space-between;
+  font-size:.5rem; letter-spacing:.2em; color:var(--silver-dim); text-transform:uppercase;
+  background:rgba(10,5,15,.85); backdrop-filter:blur(16px);
+  flex-wrap:wrap; gap:.5rem;
+}
+.f-dots { display:flex; align-items:center; gap:2.5rem; }
+.f-item { display:flex; align-items:center; gap:.5rem; }
+.f-dot { width:5px; height:5px; border-radius:50%; background:var(--silver); box-shadow:0 0 5px var(--silver); }
+.f-dot.p { background:var(--purple); box-shadow:0 0 5px var(--purple); }
+
+/* ── ANIMATION ── */
+@keyframes fadeUp { from{opacity:0; transform:translateY(18px);} to{opacity:1; transform:translateY(0);} }
+
+/* ── RESPONSIVE ── */
+@media(max-width:768px) {
+  nav { padding:1rem 1.4rem; }
+  .hero { padding:4rem 1.4rem 3.5rem; }
+  footer { padding:1rem 1.4rem; justify-content: center;}
+  .btn-grid { grid-template-columns: 1fr; }
+  .f-dots { display:none; }
+}
+</style>
+</head>
+<body>
+
+<div id="cur"></div>
+<div id="cur-ring"></div>
+<div class="bg-img"></div>
+<div class="bg-overlay"></div>
+<div class="scanlines"></div>
+<div class="noise"></div>
+
+<!-- ── LOADER ── -->
+<div id="loader">
+  <div class="ld-name">ABHIS</div>
+  <div class="ld-bar-wrap"><div class="ld-bar"></div></div>
+  <div class="ld-txt">INITIALIZING SYSTEM<span style="animation: ndot-blink 1s infinite;">_</span></div>
+</div>
+
+<div class="page">
+  <!-- ── NAV ── -->
+  <nav>
+    <a href="#" class="nav-logo">
+      <div class="nav-av"><img src="https://imgur.com/kc7Qe36.jpg" alt="Logo"></div>
+      <div class="nav-title">ABHIS HUB</div>
+    </a>
+    <div class="nav-right">
+      <div class="ndot"></div>
+      SYSTEM ONLINE
+    </div>
+  </nav>
+
+  <!-- ── HERO ── -->
+  <section class="hero">
+    <div class="hero-sys">// identity.boot() &nbsp;·&nbsp; v2.0 &nbsp;·&nbsp; SILVER_WOLF</div>
+
+    <div class="hero-avatar">
+      <img src="https://imgur.com/kc7Qe36.jpg" alt="Abhis Avatar">
+    </div>
+
+    <h1 class="hero-name" data-text="ABHIS">ABHIS</h1>
+
+    <div class="hero-rule"></div>
+
+    <div class="hero-tagline">
+      Developer &nbsp;·&nbsp; <span>Automation</span> &nbsp;·&nbsp; Creator
+    </div>
+
+    <!-- User Discord Status -->
+    <div class="discord-hero-wrap">
+      <div class="discord-hero-label">Live Status</div>
+      <div class="discord-hero-card">
+        <div class="dhc-av-wrap">
+          <div class="dhc-av"><img src="https://imgur.com/kc7Qe36.jpg" alt="Discord Avatar"></div>
+          <div class="dhc-badge" id="discord-dot"></div>
+        </div>
+        <div class="dhc-info">
+          <div class="dhc-name">ABHIS</div>
+          <div class="dhc-act" id="discord-status-text">Fetching signal...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Link Buttons Grid -->
+    <div class="btn-grid">
+      <a href="https://abhis-portfolio-lake.vercel.app/" target="_blank" class="hub-btn v-port">
+        <div class="btn-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+        </div>
+        <div class="btn-label">Portfolio</div>
+        <div class="btn-arrow">↗</div>
+      </a>
+
+      <a href="https://abhis-desk-site.vercel.app/" target="_blank" class="hub-btn v-desk">
+        <div class="btn-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+        </div>
+        <div class="btn-label">Digital Desk</div>
+        <div class="btn-arrow">↗</div>
+      </a>
+
+      <a href="https://github.com/abhinavjha928-source" target="_blank" class="hub-btn v-git">
+        <div class="btn-icon">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+        </div>
+        <div class="btn-label">GitHub</div>
+        <div class="btn-arrow">↗</div>
+      </a>
+
+      <a href="https://discord.com/users/723681043336658966" target="_blank" class="hub-btn v-disc">
+        <div class="btn-icon">
+          <svg viewBox="0 0 127.14 96.36" fill="currentColor"><path d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a68.68,68.68,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1A105.25,105.25,0,0,0,126.6,80.22h0C129.24,52.84,122.09,29.11,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53s5-12.74,11.43-12.74S54,46,53.89,53,48.84,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.31,60,73.31,53s5-12.74,11.43-12.74S96.1,46,96,53,91,65.69,84.69,65.69Z"/></svg>
+        </div>
+        <div class="btn-label">Discord User</div>
+        <div class="btn-arrow">↗</div>
+      </a>
+
+      <a href="mailto:abhinavjha928@gmail.com" class="hub-btn v-mail">
+        <div class="btn-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+        </div>
+        <div class="btn-label">Email</div>
+        <div class="btn-arrow">↗</div>
+      </a>
+
+      <a href="https://guns.lol/qve5" target="_blank" class="hub-btn v-guns">
+        <div class="btn-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+        </div>
+        <div class="btn-label">Guns.lol</div>
+        <div class="btn-arrow">↗</div>
+      </a>
+
+      <!-- Server Card Banner (Spans full width) -->
+      <a href="https://tri-forge.github.io/" target="_blank" class="hub-btn server-card v-disc">
+        <div class="server-info">
+          <div class="server-name">TRIFORGE SERVER</div>
+          <div class="server-active">
+            <div class="active-dot"></div>
+            <span id="server-members">Fetching Members...</span>
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 1rem;">
+          <div class="btn-icon">
+            <svg viewBox="0 0 127.14 96.36" fill="currentColor"><path d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a68.68,68.68,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1A105.25,105.25,0,0,0,126.6,80.22h0C129.24,52.84,122.09,29.11,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53s5-12.74,11.43-12.74S54,46,53.89,53,48.84,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.31,60,73.31,53s5-12.74,11.43-12.74S96.1,46,96,53,91,65.69,84.69,65.69Z"/></svg>
+          </div>
+          <div class="btn-arrow">↗</div>
+        </div>
+      </a>
+      
+    </div>
+  </section>
+
+  <!-- ── FOOTER ── -->
+  <footer>
+    <div class="f-item">
+      ABHIS DIGITAL HUB &copy; <span id="year"></span>
+    </div>
+    <div class="f-dots">
+      <div class="f-item">SYS <div class="f-dot"></div></div>
+      <div class="f-item">NET <div class="f-dot p"></div></div>
+    </div>
+  </footer>
+</div>
+
+<!-- Scripts -->
+<script>
+  // 1. Current Year
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  // 2. Custom Cursor
+  const cur = document.getElementById('cur');
+  const ring = document.getElementById('cur-ring');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+  document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+  
+  function animCursor() {
+    rx += (mx - rx) * 0.2; ry += (my - ry) * 0.2;
+    cur.style.left = mx + 'px'; cur.style.top = my + 'px';
+    ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
+    requestAnimationFrame(animCursor);
+  }
+  animCursor();
+
+  document.querySelectorAll('a').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      cur.style.width = '6px'; cur.style.height = '6px';
+      ring.style.width = '45px'; ring.style.height = '45px';
+      ring.style.borderColor = 'var(--purple)';
+    });
+    el.addEventListener('mouseleave', () => {
+      cur.style.width = '8px'; cur.style.height = '8px';
+      ring.style.width = '30px'; ring.style.height = '30px';
+      ring.style.borderColor = 'rgba(229,231,235,.45)';
+    });
+  });
+
+  // 3. Remove Loader
+  window.addEventListener('load', () => {
+    setTimeout(() => {
+      const loader = document.getElementById('loader');
+      loader.style.transition = 'opacity 0.6s ease';
+      loader.style.opacity = '0';
+      setTimeout(() => loader.style.display = 'none', 600);
+    }, 1800);
+  });
+
+  // 4. Live User Discord Status (Lanyard API)
+  const lanyardAPI = 'https://api.lanyard.rest/v1/users/723681043336658966';
+  const statusDot = document.getElementById('discord-dot');
+  const statusText = document.getElementById('discord-status-text');
+
+  async function fetchUserStatus() {
+    try {
+      const res = await fetch(lanyardAPI);
+      const json = await res.json();
+      if (json.success) {
+        const d = json.data;
+        
+        let color = '#747f8d'; // Offline
+        if (d.discord_status === 'online') color = '#23a559';
+        else if (d.discord_status === 'idle') color = '#f0b232';
+        else if (d.discord_status === 'dnd') color = '#f23f43';
+        
+        statusDot.style.backgroundColor = color;
+        statusDot.style.borderColor = 'var(--card-bg)';
+        statusDot.style.boxShadow = `0 0 8px ${color}`;
+
+        let currentStatus = 'Offline';
+        if (d.discord_status !== 'offline') currentStatus = 'Online';
+
+        if (d.activities && d.activities.length > 0) {
+          const customStatus = d.activities.find(a => a.type === 4);
+          const playingGame = d.activities.find(a => a.type === 0);
+          const listeningSpotify = d.spotify;
+
+          if (customStatus && customStatus.state) {
+            currentStatus = customStatus.state;
+          } else if (playingGame) {
+            currentStatus = `Playing ${playingGame.name}`;
+          } else if (listeningSpotify) {
+            currentStatus = `Listening to Spotify`;
+          }
+        }
+        statusText.textContent = currentStatus;
+      }
+    } catch (err) {
+      statusText.textContent = 'Status Offline';
+    }
+  }
+
+  // 5. Live Server Active Members (Discord Widget API)
+  const guildAPI = 'https://discord.com/api/guilds/1503255333869715517/widget.json';
+  const serverText = document.getElementById('server-members');
+
+  async function fetchServerStatus() {
+    try {
+      const res = await fetch(guildAPI);
+      if (!res.ok) throw new Error("Widget disabled or unavailable");
+      const json = await res.json();
+      
+      if (json.presence_count !== undefined) {
+        serverText.textContent = `${json.presence_count} Members Online`;
+      } else {
+        serverText.textContent = 'Join Server';
+      }
+    } catch (err) {
+      serverText.textContent = 'Join Server';
+    }
+  }
+
+  // Ping APIs
+  fetchUserStatus();
+  fetchServerStatus();
+  setInterval(fetchUserStatus, 15000);
+  setInterval(fetchServerStatus, 30000);
+</script>
+</body>
+</html>
