@@ -308,15 +308,17 @@
     transform: scale(1.03); border-color: var(--glow-core); background: rgba(170, 0, 255, 0.2); 
     box-shadow: 0 0 50px var(--glow-intense), inset 0 0 20px rgba(170,0,255,0.3);
   }
+  .ip-box .port-text { color: var(--silver2); font-size: 1.1rem; font-weight: normal; }
+  .ip-box .sep { margin: 0 8px; color: var(--purple2); }
 
-  /* Staff / Owners Grid */
-  .staff-grid { display: grid; gap: 2.5rem; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+  /* Staff / Owners Grid Update */
+  .staff-grid { display: grid; gap: 2.5rem; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); }
   .staff-grid--single { max-width: 380px; margin: 0 auto; }
   
   .person { 
     background: var(--bg2); border: 1px solid var(--border); border-radius: 24px; 
     overflow: hidden; transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
-    position: relative; min-height: 450px; display: flex; align-items: flex-end;
+    position: relative; min-height: 380px; display: flex; align-items: flex-end;
     box-shadow: 0 10px 30px rgba(0,0,0,0.5);
   }
   .person::before {
@@ -341,7 +343,27 @@
   .person h3 { font-size: 1.8rem; font-weight: 900; color: #fff; margin-bottom: .4rem; text-shadow: 0 0 20px rgba(0,0,0,1); transition: 0.3s; }
   .person:hover h3 { color: var(--glow-core); text-shadow: 0 0 20px var(--purple2); }
   .person .role { font-size: .85rem; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; color: var(--purple3); text-shadow: 0 0 15px rgba(0,0,0,1); }
-  .badge-week { display: inline-block; margin-bottom: .8rem; font-size: .75rem; letter-spacing: .25em; text-transform: uppercase; color: #23d18b; font-weight: 700; text-shadow: 0 0 15px rgba(35, 209, 139, 0.8); border: 1px solid #23d18b; padding: 4px 12px; border-radius: 100px; background: rgba(35, 209, 139, 0.1);}
+  
+  .person .desc {
+    font-size: 0.85rem; color: var(--silver2); line-height: 1.5; margin-top: 8px;
+    text-transform: none; letter-spacing: normal; text-shadow: 0 0 10px #000; font-weight: 500;
+  }
+
+  /* Discord / Action Profile Buttons */
+  .btn-profile {
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    margin-top: 15px; padding: 8px 18px;
+    background: rgba(88, 101, 242, 0.15); border: 1px solid rgba(88, 101, 242, 0.5); border-radius: 8px;
+    color: #fff; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
+    transition: 0.3s; text-decoration: none; position: relative; z-index: 5;
+  }
+  .btn-profile:hover {
+    background: #5865F2; border-color: #5865F2; box-shadow: 0 5px 20px rgba(88,101,242,0.4); transform: translateY(-3px);
+  }
+  .btn-profile.alt { background: rgba(170, 0, 255, 0.15); border-color: rgba(170, 0, 255, 0.5); }
+  .btn-profile.alt:hover { background: var(--purple); border-color: var(--purple2); box-shadow: 0 5px 20px var(--glow); }
+  
+  .btn-row { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 5px; }
 
   /* FAQ */
   .faq { max-width: 850px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
@@ -354,7 +376,7 @@
   details[open] summary::after { transform: rotate(45deg); color: var(--glow-core); text-shadow: 0 0 25px var(--glow-intense); }
   details p { color: var(--silver2); padding: 0 0 28px; font-size: 1.05rem; line-height: 1.8; }
 
-  /* Join CTA */
+  /* Join CTA & Banners */
   .community-inner {
     background: linear-gradient(135deg, rgba(170, 0, 255, .15), rgba(208, 77, 255, .08));
     border: 1px solid var(--border2); border-radius: 30px;
@@ -403,15 +425,28 @@
     /* Sleek Mobile Bottom Dock */
     nav { 
       position: fixed; top: auto; bottom: 20px; left: 50%; transform: translateX(-50%);
-      width: 92%; border-radius: 20px; padding: 16px 10px;
-      justify-content: space-around; gap: 8px;
+      width: 95%; border-radius: 20px; padding: 14px 6px;
+      justify-content: space-around; gap: 4px;
       background: rgba(10, 4, 20, 0.85); border: 1px solid var(--border2);
       box-shadow: 0 10px 40px rgba(0,0,0,0.8), 0 0 30px var(--glow);
       backdrop-filter: blur(20px);
     }
-    nav a { font-size: 0.75rem; letter-spacing: 1px; }
+    nav a { font-size: 0.7rem; letter-spacing: 0.5px; }
     nav a::after { display: none; /* remove underline on mobile dock */ }
     nav a:active { color: var(--glow-core); }
+
+    /* Fix IP Box Mobile Breakage */
+    .ip-box {
+      flex-direction: column;
+      gap: 6px;
+      padding: 16px 20px;
+      width: 100%;
+      max-width: 320px;
+      text-align: center;
+    }
+    .ip-box #ipText { font-size: 1.3rem; word-wrap: break-word; }
+    .ip-box .port-text { font-size: 0.95rem !important; }
+    .ip-box .sep { display: none; }
 
     /* Move Music Toggle top right so it doesn't clash with dock */
     .music-toggle { 
@@ -450,8 +485,9 @@
   <nav>
     <a href="#about" class="nav-link">About</a>
     <a href="#smp" class="nav-link">SMP</a>
-    <a href="#features" class="nav-link">Features</a>
-    <a href="#owners" class="nav-link">Staff</a>
+    <a href="#owners" class="nav-link">Owners</a>
+    <a href="#core-staff" class="nav-link">Staff</a>
+    <a href="#ecosystem" class="nav-link">Ecosystem</a>
     <a href="#faq" class="nav-link">FAQ</a>
   </nav>
 
@@ -560,7 +596,7 @@
           
           <div class="ip-box" id="copyIpBtn" style="cursor:pointer;">
               <span id="ipText">play.bewafa.fun</span>
-              <span style="color: var(--silver2); font-size: 1.1rem; font-weight: normal;">| Port: 25566</span>
+              <span class="port-text"><span class="sep">|</span> Port: 25566</span>
           </div>
           <p id="copyAlert" style="color: #23d18b; font-size: 0.9rem; font-weight:bold; opacity: 0; transition: opacity 0.5s ease; margin-top: 20px; text-transform: uppercase; letter-spacing: 2px; text-shadow: 0 0 15px rgba(35, 209, 139, 0.6);">Copied to clipboard!</p>
       </div>
@@ -602,6 +638,7 @@
           <div class="body">
             <h3>Aditya</h3>
             <div class="role">Founder</div>
+            <a href="https://discord.com/users/1494190840648564777" target="_blank" class="btn-profile">Discord Profile</a>
           </div>
         </div>
         <div class="person reveal">
@@ -609,6 +646,7 @@
           <div class="body">
             <h3>King</h3>
             <div class="role">Founder</div>
+            <a href="https://discord.com/users/1287665700843819021" target="_blank" class="btn-profile">Discord Profile</a>
           </div>
         </div>
         <div class="person reveal">
@@ -616,6 +654,7 @@
           <div class="body">
             <h3>Saurabh</h3>
             <div class="role">Founder</div>
+            <a href="https://discord.com/users/940179418905718815" target="_blank" class="btn-profile">Discord Profile</a>
           </div>
         </div>
         <div class="person reveal">
@@ -623,6 +662,7 @@
           <div class="body">
             <h3>Vedant</h3>
             <div class="role">Founder</div>
+            <a href="https://discord.com/users/1147942434676936845" target="_blank" class="btn-profile">Discord Profile</a>
           </div>
         </div>
       </div>
@@ -631,20 +671,112 @@
 
   <div class="divider"></div>
 
-  <section id="staff">
+  <section id="core-staff">
     <div class="container">
       <div class="section-head reveal">
-        <div class="section-tag">Recognition</div>
-        <h2>Staff of the Week</h2>
-        <p>Shoutout to the members keeping the vibe alive</p>
+        <div class="section-tag">Management</div>
+        <h2>Core Staff</h2>
+        <p>The dedicated team managing the community</p>
       </div>
-      <div class="staff-grid staff-grid--single">
+      <div class="staff-grid">
         <div class="person reveal">
           <img class="avatar-img" src="abhis.png" alt="Abhis" onerror="this.src='https://api.dicebear.com/7.x/shapes/svg?seed=Abhis'">
           <div class="body">
-            <span class="badge-week">Staff of the Week</span>
             <h3>Abhis</h3>
-            <div class="role">Staff</div>
+            <div class="role">Dev & Senior Management</div>
+            <a href="https://discord.com/users/723681043336658966" target="_blank" class="btn-profile">Discord Profile</a>
+          </div>
+        </div>
+        <div class="person reveal">
+          <img class="avatar-img" src="albatraoz.jpg" alt="Albatraoz" onerror="this.src='https://api.dicebear.com/7.x/shapes/svg?seed=Albatraoz'">
+          <div class="body">
+            <h3>Albatraoz</h3>
+            <div class="role">Female Owner</div>
+            <a href="https://discord.com/users/941208796846506004" target="_blank" class="btn-profile">Discord Profile</a>
+          </div>
+        </div>
+        <div class="person reveal">
+          <img class="avatar-img" src="alex.gif" alt="Alex" onerror="this.src='https://api.dicebear.com/7.x/shapes/svg?seed=Alex'">
+          <div class="body">
+            <h3>Alex</h3>
+            <div class="role">Dev & Management</div>
+            <a href="https://discord.com/users/1513777785636786262" target="_blank" class="btn-profile">Discord Profile</a>
+          </div>
+        </div>
+        <div class="person reveal">
+          <img class="avatar-img" src="neutron.png" alt="Neutron" onerror="this.src='https://api.dicebear.com/7.x/shapes/svg?seed=Neutron'">
+          <div class="body">
+            <h3>Neutron</h3>
+            <div class="role">Head Dev</div>
+            <a href="https://discord.com/users/756828649780674631" target="_blank" class="btn-profile">Discord Profile</a>
+          </div>
+        </div>
+        <div class="person reveal">
+          <img class="avatar-img" src="ankush.png" alt="Ankush" onerror="this.src='https://api.dicebear.com/7.x/shapes/svg?seed=Ankush'">
+          <div class="body">
+            <h3>Ankush</h3>
+            <div class="role">Head Management & Co Owner</div>
+            <a href="https://discord.com/users/1390506798464630894" target="_blank" class="btn-profile">Discord Profile</a>
+          </div>
+        </div>
+        <div class="person reveal">
+          <img class="avatar-img" src="cold.png" alt="Cold" onerror="this.src='https://api.dicebear.com/7.x/shapes/svg?seed=Cold'">
+          <div class="body">
+            <h3>Cold</h3>
+            <div class="role">Head Management & Co Owner</div>
+            <a href="https://discord.com/users/1454464681543733422" target="_blank" class="btn-profile">Discord Profile</a>
+          </div>
+        </div>
+        <div class="person reveal">
+          <img class="avatar-img" src="tanishq.gif" alt="Tanishq" onerror="this.src='https://api.dicebear.com/7.x/shapes/svg?seed=Tanishq'">
+          <div class="body">
+            <h3>Tanishq</h3>
+            <div class="role">Co Owner</div>
+            <a href="https://discord.com/users/952779594589671464" target="_blank" class="btn-profile">Discord Profile</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section id="ecosystem">
+    <div class="container">
+      <div class="section-head reveal">
+        <div class="section-tag">Ecosystem</div>
+        <h2>Bots & Servers</h2>
+        <p>Our official projects and partner communities</p>
+      </div>
+      <div class="staff-grid">
+        <div class="person reveal">
+          <img class="avatar-img" src="zyrox.png" alt="Zyrox" onerror="this.src='https://api.dicebear.com/7.x/shapes/svg?seed=Zyrox'">
+          <div class="body">
+            <h3>Zyrox</h3>
+            <div class="role">Official Discord Bot</div>
+            <div class="btn-row">
+              <a href="https://discord.com/oauth2/authorize?client_id=1502655662943895712" target="_blank" class="btn-profile alt">Invite Bot</a>
+              <a href="https://zyroxblack.qzz.io/" target="_blank" class="btn-profile alt">Website</a>
+              <a href="https://discord.gg/D2Y5JqShU3" target="_blank" class="btn-profile alt">Support</a>
+            </div>
+          </div>
+        </div>
+        
+        <div class="person reveal">
+          <img class="avatar-img" src="miku.webp" alt="Miku Community" onerror="this.src='https://api.dicebear.com/7.x/shapes/svg?seed=Miku'">
+          <div class="body">
+            <h3>Miku Community</h3>
+            <div class="desc">BEST LTC EVENT SERVER EVER</div>
+            <a href="https://discord.gg/mikucm" target="_blank" class="btn-profile">Join Server</a>
+          </div>
+        </div>
+
+        <div class="person reveal">
+          <img class="avatar-img" src="freecloud.jpg" alt="Freecloud" onerror="this.src='https://api.dicebear.com/7.x/shapes/svg?seed=Freecloud'">
+          <div class="body">
+            <h3>Freecloud</h3>
+            <div class="desc">Welcome to Freecloud! Get free MCFA & Nitro through Events and fun Giveaways. Stay with us for:<br>Minecraft Rewards • Free Gen</div>
+            <a href="https://discord.gg/mcfa" target="_blank" class="btn-profile">Join Server</a>
           </div>
         </div>
       </div>
@@ -694,9 +826,6 @@
         <div class="socials">
           <a href="https://discord.gg/bewafa" target="_blank" rel="noopener" title="Discord" aria-label="Discord">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.317 4.369a19.79 19.79 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.249a18.27 18.27 0 0 0-5.487 0 12.6 12.6 0 0 0-.617-1.25.077.077 0 0 0-.079-.036A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.1 13.1 0 0 1-1.872-.892.077.077 0 0 1-.008-.128c.126-.094.252-.192.372-.291a.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.061 0a.074.074 0 0 1 .078.009c.12.099.246.198.373.292a.077.077 0 0 1-.006.127 12.3 12.3 0 0 1-1.873.892.076.076 0 0 0-.04.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.84 19.84 0 0 0 6.002-3.03.077.077 0 0 0 .032-.055c.5-5.177-.838-9.674-3.549-13.66a.06.06 0 0 0-.031-.028ZM8.02 15.331c-1.183 0-2.157-1.086-2.157-2.419 0-1.333.955-2.42 2.157-2.42 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.419-2.157 2.419Zm7.975 0c-1.183 0-2.157-1.086-2.157-2.419 0-1.333.955-2.42 2.157-2.42 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.419-2.157 2.419Z"/></svg>
-          </a>
-          <a href="https://instagram.com/discordbewafa" target="_blank" rel="noopener" title="Instagram" aria-label="Instagram">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.16c3.2 0 3.58.01 4.85.07 1.17.05 1.8.25 2.23.41.56.22.96.48 1.38.9.42.42.68.82.9 1.38.16.42.36 1.06.41 2.23.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.05 1.17-.25 1.8-.41 2.23-.22.56-.48.96-.9 1.38-.42.42-.82.68-1.38.9-.42.16-1.06.36-2.23.41-1.27.06-1.65.07-4.85.07s-3.58-.01-4.85-.07c-1.17-.05-1.8-.25-2.23-.41a3.7 3.7 0 0 1-1.38-.9 3.7 3.7 0 0 1-.9-1.38c-.16-.42-.36-1.06-.41-2.23C2.17 15.58 2.16 15.2 2.16 12s.01-3.58.07-4.85c.05-1.17.25-1.8.41-2.23.22-.56.48-.96.9-1.38.42-.42.82-.68 1.38-.9.42-.16 1.06-.36 2.23-.41C8.42 2.17 8.8 2.16 12 2.16Zm0 1.62c-3.15 0-3.52.01-4.76.07-1.15.05-1.77.24-2.18.4-.55.22-.94.47-1.35.88-.41.41-.66.8-.88 1.35-.16.41-.35 1.03-.4 2.18-.06 1.24-.07 1.61-.07 4.76s.01 3.52.07 4.76c.05 1.15.24 1.77.4 2.18.22.55.47.94.88 1.35.41.41.8.66 1.35.88.41.16 1.03.35 2.18.4 1.24.06 1.61.07 4.76.07s3.52-.01 4.76-.07c1.15-.05 1.77-.24 2.18-.4.55-.22.94-.47 1.35-.88.41-.41.66-.8.88-1.35.16-.41.35-1.03.4-2.18.06-1.24.07-1.61.07-4.76s-.01-3.52-.07-4.76c-.05-1.15-.24-1.77-.4-2.18a3.64 3.64 0 0 0-.88-1.35 3.64 3.64 0 0 0-1.35-.88c-.41-.16-1.03-.35-2.18-.4-1.24-.06-1.61-.07-4.76-.07Zm0 2.76a5.46 5.46 0 1 0 0 10.92 5.46 5.46 0 0 0 0-10.92Zm0 9a3.54 3.54 0 1 1 0-7.08 3.54 3.54 0 0 1 0 7.08Zm5.68-9.23a1.28 1.28 0 1 1-2.55 0 1.28 1.28 0 0 1 2.55 0Z"/></svg>
           </a>
         </div>
         <div>SMP Powered by our VPS Sponsor, <a href="https://discord.gg/aSRxhXbctZ" target="_blank" rel="noopener" style="color: var(--purple3); font-weight: 700; text-shadow: 0 0 10px var(--glow);">Nebula Hosting</a></div>
